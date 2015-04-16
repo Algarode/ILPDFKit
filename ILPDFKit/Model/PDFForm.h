@@ -1,14 +1,50 @@
-//  Created by Derek Blair on 2/24/2014.
-//  Copyright (c) 2014 iwelabs. All rights reserved.
+// PDFForm.h
+//
+// Copyright (c) 2015 Iwe Labs
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 
 #import <Foundation/Foundation.h>
-#import "PDFWidgetAnnotationView.h"
 
+typedef NS_OPTIONS(NSUInteger, PDFAnnotationFlags) {
+    PDFAnnotationFlagInvisible      = 1 << 0,
+    PDFAnnotationFlagHidden         = 1 << 1,
+    PDFAnnotationFlagPrint          = 1 << 2,
+    PDFAnnotationFlagNoZoom         = 1 << 3,
+    PDFAnnotationFlagNoRotate       = 1 << 4,
+    PDFAnnotationFlagNoView         = 1 << 5,
+    PDFAnnotationFlagReadOnly       = 1 << 6
+};
 
-
-
-#define BIT(n,i) (((i)>>(n))&1)
-
+typedef NS_OPTIONS(NSUInteger, PDFFormFlags) {
+    PDFFormFlagReadOnly             = 1 << 0,
+    PDFFormFlagRequired             = 1 << 1,
+    PDFFormFlagNoExport             = 1 << 2,
+    PDFFormFlagTextFieldMultiline   = 1 << 12,
+    PDFFormFlagTextFieldPassword    = 1 << 13,
+    PDFFormFlagButtonNoToggleToOff  = 1 << 14,
+    PDFFormFlagButtonRadio          = 1 << 15,
+    PDFFormFlagButtonPushButton     = 1 << 16,
+    PDFFormFlagChoiceFieldIsCombo   = 1 << 17,
+    PDFFormFlagChoiceFieldEditable  = 1 << 18,
+    PDFFormFlagChoiceFieldSorted    = 1 << 19,
+};
 
 typedef NS_ENUM(NSUInteger, PDFFormType) {
     PDFFormTypeNone = 0,
@@ -19,14 +55,10 @@ typedef NS_ENUM(NSUInteger, PDFFormType) {
     PDFFormTypeNumberOfFormTypes
 };
 
-
 @class PDFFormContainer;
 @class PDFPage;
 @class PDFDictionary;
-@class PDFUIElement;
 @class PDFWidgetAnnotationView;
-
-
 
 /** The PDFForm class represents a Widget Annotation owned by an interactive PDF form corresponding to a Field Dictionary contained in the 'Fields' array of the document's 'AcroForm' dictionary. Thus each instance of PDFForm represents a unique rectangle on the PDF document where user interaction is permitted, whether through pressing or typing text. A 'Field' is a collection of PDFForm with the same name. All forms in a field have the same value. A 'Field' represents a coherent group of forms that work together to present and collect a common unified piece of information. For example a field may consist of the two button forms named 'Sex' and marked 'Male' and 'Female' respectively to collect the information of a person's gender. A form can create a UIView representation of itself that can respond to user interaction.
  
@@ -34,19 +66,19 @@ typedef NS_ENUM(NSUInteger, PDFFormType) {
  [webView.scrollView addSubview comboBox];
  [comboBox release];
  */
-@interface PDFForm : NSObject<PDFWidgetAnnotationViewDelegate>
+@interface PDFForm : NSObject 
 
 /** The value of the form.
  */
-@property(nonatomic,strong) NSString* value;
+@property (nonatomic, strong) NSString *value;
 
 /** The page number on which the form appears. The first page has value 1.
  */
-@property(nonatomic) NSUInteger page;
+@property (nonatomic, readonly) NSUInteger page;
 
 /** The rect in points obtained from the 'Rect' rectangle array and applying -(CGRect)rect on the PDFArray
  */
-@property(nonatomic) CGRect frame;
+@property (nonatomic, readonly) CGRect frame;
 
 /** The form type.
  
@@ -57,32 +89,32 @@ typedef NS_ENUM(NSUInteger, PDFFormType) {
  - PDFFormTypeSignature: A signature form.
  
  */
-@property(nonatomic) PDFFormType formType;
+@property (nonatomic, readonly) PDFFormType formType;
 
 
 /** The crop box for the parent PDF page.
  */
-@property(nonatomic) CGRect cropBox;
+@property (nonatomic, readonly) CGRect cropBox;
 
 
 /** The media box for the parent PDF page.
  */
-@property(nonatomic) CGRect mediaBox;
+@property (nonatomic, readonly) CGRect mediaBox;
 
 /** The full, period delimeted form name.
  e.g PersonalInfo.Address.PostalCode
  */
-@property(nonatomic,strong) NSString* name;
+@property (nonatomic, strong, readonly) NSString *name;
 
 
 /** The name of the field shown to the user
  */
-@property(nonatomic,strong) NSString* uname;
+@property (nonatomic, strong, readonly) NSString *uname;
 
 
 /** The default value for the form.
  */
-@property(nonatomic,strong) NSString* defaultValue;
+@property (nonatomic, strong, readonly) NSString *defaultValue;
 
 /** A string containing all flags.
  Current supported flags are:
@@ -106,60 +138,55 @@ typedef NS_ENUM(NSUInteger, PDFFormType) {
  - NoView
  
  */
-@property(nonatomic,strong) NSString* flagsString;
+@property (nonatomic, strong, readonly) NSString *flagsString;
 
 
 /** For choice fields only, the options of the combo box.
  */
-@property(nonatomic,strong) NSArray* options;
+@property (nonatomic, strong) NSArray *options;
 
 /** The intended text alignemnt for text in the form.
  */
-@property(nonatomic) NSTextAlignment textAlignment;
+@property (nonatomic, readonly) NSTextAlignment textAlignment;
 
 /** The frame of the form view on its parent UIScrollView
  */
-@property(nonatomic) CGRect uiBaseFrame;
+@property (nonatomic, readonly) CGRect uiBaseFrame;
 
 /** The frame of the form view on its parent UIScrollView if all forms were on the first page
  */
-@property(nonatomic) CGRect pageFrame;
+@property (nonatomic, readonly) CGRect pageFrame;
 
 /** The form container that owns the form
  */
-@property(nonatomic,weak) PDFFormContainer* parent;
+@property (nonatomic, weak, readonly) PDFFormContainer *parent;
 
-/** The dictionary containing all PDFFormAction actions. The keys match the corresponding key through which the action exists in it's parent PDFDictionary. The main action is under 'A' and additionaly actions are found uner 'K' and 'E'.
- */
-@property(nonatomic,strong) NSMutableDictionary* actions;
 
 /** The NSArray of NSNumber values representing the raw frame rectangle for the form.
  */
-@property(nonatomic,strong) NSArray* rawRect;
+@property (nonatomic, strong, readonly) NSArray *rawRect;
 
 
 /** This is used with button forms only. Gives the name of the choice represented by that button.
  @discussion If a button is part of a group of buttons where only one may be selected at once, then it's value is the exportValue of the selected button. All buttons in such a group have the same name and represent a single form conceptually. Thus all forms in a radio button or check box group represent the field and always have the same value. A button is selected if and only if its exportValue is the same as its value. If no buttons are selected, or an unselected button is single and not part of a group, then the value is nil.
  */
-@property(nonatomic,strong) NSString* exportValue;
+@property (nonatomic, strong, readonly) NSString *exportValue;
 
 
 /** Indicates if the form has been modified by user input.
  */
-@property(nonatomic) BOOL modified;
+@property (nonatomic, readonly) BOOL modified;
 
 
 /** The appearance stream for the set state of button forms. Can be used to customize button appearance to better match the PDF.
  */
-@property(nonatomic,strong) NSString* setAppearanceStream;
+@property (nonatomic, strong, readonly) NSString *setAppearanceStream;
 
 
 /**
  The field dictionary that defines the form
  */
-@property(nonatomic,strong) PDFDictionary* dictionary;
-
-
+@property (nonatomic, strong, readonly) PDFDictionary *dictionary;
 
 /**---------------------------------------------------------------------------------------
  * @name Creating a PDFForm
@@ -174,8 +201,7 @@ typedef NS_ENUM(NSUInteger, PDFFormType) {
  @param p The parent.
  @return A new PDFForm object. 
  */
--(id)initWithFieldDictionary:(PDFDictionary*)leaf Page:(PDFPage*)pg Parent:(PDFFormContainer*)p;
-
+- (instancetype)initWithFieldDictionary:(PDFDictionary *)leaf page:(PDFPage *)pg parent:(PDFFormContainer *)p NS_DESIGNATED_INITIALIZER;
 
 /**---------------------------------------------------------------------------------------
  * @name Updating Data
@@ -184,23 +210,18 @@ typedef NS_ENUM(NSUInteger, PDFFormType) {
 
 /** Resets the form to defaultValue if it exists, otherwise sets value to nil.
  */
--(void)reset;
-
+- (void)reset;
 
 /**---------------------------------------------------------------------------------------
  * @name Rendering
  *  ---------------------------------------------------------------------------------------
  */
 
-
 /** Renders the view in vector graphics within a PDF context.
  @param ctx The PDF context to render into.
  @param rect The rectangle to render on.
  */
--(void)vectorRenderInPDFContext:(CGContextRef)ctx forRect:(CGRect)rect;
-
-
-
+- (void)vectorRenderInPDFContext:(CGContextRef)ctx forRect:(CGRect)rect;
 
 /** Returns a view to represent the form.
  
@@ -210,8 +231,7 @@ typedef NS_ENUM(NSUInteger, PDFFormType) {
  @return A new view representing the form. The caller is responsible for releasing the new form view.
  @discussion The superview must be a UIScrollView or a subclass of UIScrollView.
  */
--(PDFWidgetAnnotationView*)createWidgetAnnotationViewForSuperviewWithWidth:(CGFloat)vwidth XMargin:(CGFloat)xmargin YMargin:(CGFloat)ymargin;
-
+- (PDFWidgetAnnotationView *)createWidgetAnnotationViewForSuperviewWithWidth:(CGFloat)vwidth xMargin:(CGFloat)xmargin yMargin:(CGFloat)ymargin;
 
 /**---------------------------------------------------------------------------------------
  * @name KVO
@@ -222,7 +242,7 @@ typedef NS_ENUM(NSUInteger, PDFFormType) {
  Removes any UI elements observing the form value
  */
 
--(void)removeObservers;
+- (void)removeObservers;
 
 @end
 

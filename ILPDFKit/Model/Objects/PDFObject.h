@@ -1,4 +1,4 @@
-// PDFFormChoiceField.h
+// PDFObject.h
 //
 // Copyright (c) 2015 Iwe Labs
 //
@@ -20,26 +20,45 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import <UIKit/UIKit.h>
-#import "PDFWidgetAnnotationView.h"
+#import <Foundation/Foundation.h>
 
+typedef NS_OPTIONS(NSUInteger, PDFRepOptions) {
+    PDFRepOptionNone = 0,
+    PDFRepOptionUseUTF8 = 1 << 0
+};
 
-/** The PDFFormChoiceField represents a view for a PDF choice field.
+/** All basic PDF object classes implement this protocol. PDFArray, PDFDictionary, PDFString, PDFName etc.
  */
-@interface PDFFormChoiceField : PDFWidgetAnnotationView 
+@protocol PDFObject <NSObject, NSCopying>
 
-
-/**---------------------------------------------------------------------------------------
- * @name Creating a PDFFormChoiceField
- *  ---------------------------------------------------------------------------------------
+/**
+ @param rep A byte sequence respresention of the object as it appears in a PDF file.
+ @param flags Optional flags to specifiy how to interpret the byte sequence.
+ @return A PDF object based on the representation, or nil if the representation is invalid.
  */
++ (instancetype)pdfObjectWithRepresentation:(NSData *)rep flags:(PDFRepOptions)flags;
 
-/** Creates a new instance of PDFFormChoiceField 
- 
- @param frame The new view's frame.
- @param opt An array of NSString obejcts representing the choices for the field.
- @return A new PDFFormChoiceField object. 
+/**
+ @return An ASCII string representation of the object.
  */
-- (instancetype)initWithFrame:(CGRect)frame options:(NSArray *)opt NS_DESIGNATED_INITIALIZER;
+- (NSString *)pdfFileRepresentation;
+
+/**
+ @return The type of the PDF as described by the Core Graphics framework.
+ */
+- (CGPDFObjectType)type;
 
 @end
+
+
+
+
+
+
+
+
+
+
+
+
+

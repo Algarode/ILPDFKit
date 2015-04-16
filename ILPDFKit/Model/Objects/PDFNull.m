@@ -1,5 +1,5 @@
-// PDFFormChoiceField.h
-//
+// PDFNull.m
+// 
 // Copyright (c) 2015 Iwe Labs
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -8,10 +8,10 @@
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-//
+// 
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-//
+// 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -20,26 +20,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import <UIKit/UIKit.h>
-#import "PDFWidgetAnnotationView.h"
+#import "PDFNull.h"
+#import "PDFUtility.h"
 
+@implementation NSNull(PDFObject)
 
-/** The PDFFormChoiceField represents a view for a PDF choice field.
- */
-@interface PDFFormChoiceField : PDFWidgetAnnotationView 
+#pragma mark - PDFObject
 
+- (CGPDFObjectType)type {
+    return kCGPDFObjectTypeNull;
+}
 
-/**---------------------------------------------------------------------------------------
- * @name Creating a PDFFormChoiceField
- *  ---------------------------------------------------------------------------------------
- */
+- (NSString *)pdfFileRepresentation {
+    return @"null";
+}
 
-/** Creates a new instance of PDFFormChoiceField 
- 
- @param frame The new view's frame.
- @param opt An array of NSString obejcts representing the choices for the field.
- @return A new PDFFormChoiceField object. 
- */
-- (instancetype)initWithFrame:(CGRect)frame options:(NSArray *)opt NS_DESIGNATED_INITIALIZER;
++ (instancetype)pdfObjectWithRepresentation:(NSData *)rep flags:(PDFRepOptions)flags {
+    NSString *work = [PDFUtility trimmedStringFromPDFData:rep];
+    if ([work isEqualToString:@"null"]) {
+        return [NSNull null];
+    }
+    return nil;
+}
+
 
 @end
